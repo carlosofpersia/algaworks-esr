@@ -1,0 +1,713 @@
+
+
+4. Rest com Spring
+
+4.1. O que é REST?
+	REpresentational State Transfer (Roy Field)
+
+	Consumidor (Cliente) + Provedor (Servidor)
+	Separação entre cliente e servidor;
+	Escalabilidade;
+	Independência de linguagem;
+	Mercado;
+	Modelo arquitetural simples e intuitivo;
+	
+	
+4.2. Conhecendo as Constraints do REST (Melhores práticas)
+	* Constraints
+		1. Cliente-servidor (API);
+		2. Stateless (Sem estado - protocolo http sem sessão);
+		3. Cache (Possibilidade de usar cache);
+		4. Interface uniforme (Conjunto de interações bem definida, arquitetura desacoplada (URI -> GET, POST, PUT, DELETE));
+		5. Sistema em camadas (Sistema agnóstico);
+		6. Código sob demanda;
+
+4.3. Diferença entre REST e RESTful
+	Diferença conceitual;
+	Rest: Estilo arquitetural que possui as constraints, ou seja, é a especificação;
+	Restful é a API desenvolvida em conformidade com "todas" as constraints;
+	
+4.4. Desenvolvedores de REST APIs puristas e pragmáticos
+
+	Puristas: Se Roy Field falou é regra (muita teoria);
+	Pragmáticos, usam o que precisa para concretizar o projeto;
+
+4.5. Conhecendo o protocolo HTTP
+
+--------------------
+	* Composição da requisição:
+
+	[Método] [URI] HTTP / [versão]
+		POST /produtos HTTP/1.1
+	[Cabeçalhos]
+		Content-Type: application/json Accept: application/json
+	[corpo/payload]
+		{
+			"nome": "Notebook i7",
+			"preco": "2100.0"
+		}
+--------------------
+	* Composição da resposta:
+
+	HTTP/ [Versão] [STATUS]
+		HTTP/1.1 201 Created
+	[Cabeçalhos]
+		Content-Type application/json
+	[CORPO]
+		{
+			"codigo": "331",
+			"nome": "Notebook i7",
+			"preco": "2100.0"
+		}
+		
+		
+4.6. Usando o protocolo HTTP
+* Telnet, gnuTLS, curl *
+
+telnet www.uol.com.br 80
+telnet www.uol.com.br 443
+
+	GET / HTTP/1.1
+	HOST: www.uol.com.br
+	Accept: text/html
+
+GnuTLS para verificar os recursos vindos de um site (mais completo que o telnet);
+	https://gnutls.org/
+Instalando o GnuTLS no Ubunbu
+	$ sudo apt install gnutls-bin
+Instalando o GnuTLS no Windows
+Acesse https://gnutls.org/, faça download do arquivo de instalação (ZIP) para Windows e descompacte o arquivo em uma pasta.
+https://www.gnutls.org/download.html
+
+Uso:
+gnuTLS www.uol.com.br
+GET / HTTP/1.1
+HOST: www.uol.com.br
+Accept: text/html
+	
+
+https://docs.github.com/en/rest
+
+* Curl sempre é o melhor para mim ;P;
+
+curl -I api.github.com HTTP/1.1
+GET /users/carlosofpersia/repos
+HOST: https://api.github.com
+Accept: text/html
+
+curl -H "Content-Type: application/json" -X POST -d '{"username":"xyz","password":"xyz"}' http://localhost:3000/api/login
+curl -H "Content-Type: application/json" -X POST -d '{id_tipo_orcamento: 1}' http://127.0.0.1:8000/api/perspectiva/combo-list
+curl -H "Content-Type: application/json" -X POST -d '{ "name": "Carloss", "id": 1011, "rank": 7 }' https://luzicity.com.br/app-sponsored/wallet/pag-seguro/checkout/credit-card
+
+4.7. Instalando e testando o Postman
+
+	https://www.postman.com/downloads/
+	https://web.postman.co/home
+	https://web.postman.co/workspace/My-Workspace~a7d7b78b-0dd1-4d54-82b0-bf853f4607e9/overview
+	
+	https://insomnia.rest/
+	https://insomnia.rest/download
+
+
+4.8. Entendendo o que são Recursos REST
+	* Rest é formado por URI + Verbos
+	É qualquer coisa na web (documento, vídeo, imagens, nota fiscal, pagamento);
+	Um único produto é um recurso -> Singleton Resource;
+		https://api.algamarket.com.br/produtos/331
+	Coleção de produtos é um recurso -> Collection Resource;
+		https://api.algamarket.com.br/produtos
+
+4.9. Identificando recursos REST
+	URI -> Uniform Resource Identifier;
+		Endereços para os recursos;
+		
+	URI vs URL
+		Url é um tipo de URI;
+		URL -> Uniform Resource Locator;
+			Identifica a localização e identifica o recurso tb;
+		
+4.10. Modelando e requisitando um Collection Resource com GET
+
+	Criando um controller para usar o rest;
+	@Controller
+	@ResponseBody
+	@RequestMapping("/cozinhas")
+	@GetMapping
+	
+	Posso trocar (@Controller e @ResponseBody) por @RestController
+
+	// GET /cozinhas HTTP/1.1
+
+/*
+//@Controller
+//@ResponseBody
+@RestController
+@RequestMapping("/cozinhas")
+public class CozinhaController {
+
+	@Autowired
+	private CozinhaRepository cozinhaRepository;
+	
+	@GetMapping
+	public List<Cozinha> listat() {
+		
+		return cozinhaRepository.listar();
+	}
+}
+
+Testar no postman ou curl:
+	localhost:8087/cozinhas
+	curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X GET localhost:8087/cozinhas
+	https://stackoverflow.com/questions/14978411/http-post-and-get-using-curl-in-linux
+	
+Alterar o nome do hosts no linux:
+	* sudo nano /etc/hosts *
+Alterar o nome do hosts no windows:
+	* C:\Windows\System32\drivers\etc\hosts (localhost -> api.algafood.local) *
+
+* api.algafood.local:8087/cozinhas *
+
+*/
+
+4.11. Desafio: collection resource de estados
+/*
+@RestController
+@RequestMapping("/estados")
+public class EstadoController {
+
+	@Autowired
+	private EstadoRepository estadoRepository;
+
+	@GetMapping
+	public List<Estado> listar() {
+
+		return estadoRepository.listar();
+	}
+}
+*/
+
+4.12. Representações de recursos e content negotiation
+
+	É a transformção em um código para visualizar o recurso (json, xml, jpg), é definido no "Accept" (Media Type)
+	GET /produtos HTTP/1.1
+	Accept: application/json;
+	Accept: application/xml;
+	Para saber qual usar, devemos saber o que o consumidor da api usa.
+	Um recurso para ser identificado precisa de uma URI, mais precisamente de uma URL usando o protocolo HTTP/1.1
+	
+4.13. Implementando content negotiation para retornar JSON ou XML
+
+	Spring boot já é uma convenção default "application/json"
+	Se mudar e não aceitar, dara o erro 406 Not Accept
+	O Spring boot já usa a especificação "jackson" 
+		para o parse entre o JAVA e um formato específico como JSON e XML.
+
+Para usar XML no Spring, basta baixarmos a dependencia no pom.xml:
+<dependency>
+	<groupId>com.fasterxml.jackson.dataformat</groupId>
+	<artifactId>jackson-dataformat-xml</artifactId>
+</dependency>
+
+Testar no Postman -> Headers (Key: Accept e Value: application/xml)
+
+Na api, o padrão é JSON, mas se eu quiser em algum endpoint especificar XML,
+	Basta usar a propriedade "@RequestMapping ou @GetMapping":
+
+	Na mão: @GetMapping(produces = "application/json");
+	ou da classe responsável do spring (MediaType):
+	import org.springframework.http.MediaType;
+	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+
+	Aceita também um array dos tipos de midias aceitos
+	@GetMapping(produces = {
+		MediaType.APPLICATION_JSON_VALUE
+		, MediaType.APPLICATION_XML_VALUE})
+
+/*
+	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+	public List<Cozinha> listat() {
+		return cozinhaRepository.listar();
+	}
+	Caso tentem json vai funcionar, se tentar com application/xml
+		será informado um erro 406 Not Acceptable
+
+<status>406</status>
+<error>Not Acceptable</error>
+<message>Could not find acceptable representation</message>
+*/
+
+Também posso usar no escopo da classe inteira;
+
+* Usar na anotação @RequestMapping:
+Uso para somente o resource: @RequestMapping("/cozinhas")
+Uso para várias configurações:
+	@RequestMapping(value = "/cozinhas"
+	, produces = MediaType.APPLICATION_JSON_VALUE)
+
+/*
+
+@RestController
+@RequestMapping(value = "/cozinhas", produces = MediaType.APPLICATION_JSON_VALUE)
+public class CozinhaController {
+
+	@Autowired
+	private CozinhaRepository cozinhaRepository;
+
+	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+	public List<Cozinha> listar1() {
+		System.out.println("Listar 1");
+		return cozinhaRepository.listar();
+	}
+
+	@GetMapping(produces = MediaType.APPLICATION_XML_VALUE)
+	public List<Cozinha> listar2() {
+		System.out.println("Listar 2");
+		return cozinhaRepository.listar();
+	}
+}
+*/
+	
+	
+4.14. Consultando Singleton Resource com GET e @PathVariable
+
+	@GetMapping("/buscar1/{cozinhaId}")
+
+	// Path Verbos
+	@PathVariable("cozinhaId") Long  id
+		ou 
+	@PathVariable Long cozinhaId
+
+/*
+	// api.algafood.local:8087/cozinhas/buscar1/2
+@GetMapping(value = "/buscar1/{cozinhaId}", produces = {MediaType.APPLICATION_JSON_VALUE
+		, MediaType.APPLICATION_XML_VALUE})
+public Cozinha buscar(@PathVariable("cozinhaId") Long id) {
+	System.out.println("param: " + id);
+	return cozinhaRepository.buscar(id);
+}
+
+	// api.algafood.local:8087/cozinhas/buscar2/1
+@GetMapping("/buscar2/{cozinhaId}")
+public Cozinha outraFormaBuscar(@PathVariable Long cozinhaId) {
+	System.out.println("param: " + cozinhaId);
+	return cozinhaRepository.buscar(cozinhaId);
+}
+*/
+	
+4.15. Customizando as representações XML e JSON com 
+	@JsonIgnore, @JsonProperty e @JsonRootName
+	
+	
+/* Entity Cozinha
+ * 
+ * Mudar a representação do objeto na saída através da propriedade: @JsonProperty
+@JsonProperty("titulo")
+@Column(name = "nome", nullable = false)
+private String nome;
+	Saída: 
+	{
+		"id": 1,
+		"twitter": "#comidatailandesa",
+		"titulo": "Tailandesa"
+	},
+
+ * Inibir a saída através da propriedade: @JsonIgnore
+@JsonIgnore
+@Column(name = "twitter", length = 140)
+private String twitter;
+	Saída: 
+    {
+        "id": 1,
+        "titulo": "Tailandesa"
+    },
+
+ * Customizar os elementos da saída do XML (TAGS - @JsonRootName)
+	Somente para única Entity (Singleton Resource);
+
+@JsonRootName("gastronomia")
+@Data
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Entity
+@Table(name = "cozinha")
+public class Cozinha { ... }
+
+	Saída:
+	<gastronomia>
+		<id>2</id>
+		<titulo>Indiana</titulo>
+	</gastronomia>
+
+*/
+
+4.16. Customizando a representação em XML com Wrapper e anotações do Jackson
+	"@JacksonXmlRootElement(localName = "cozinhas")" -> na classe;
+	"@JsonProperty("cozinha")" -> na instancia;
+	"@JacksonXmlElementWrapper(useWrapping = false)" -> na instancia;
+	
+	Para representar as tags da saída do XML, devo criar uma classe Wrapper
+	É o modelo da representação de um recurso;
+	A classe criada é uma classe que vai empacotar uma Lista de cozinhas;
+
+// package: com.algaworks.algafood.api.model;
+// class: CozinhasXmlWrapper;
+
+Quando uso datas ele traz do lombok "GET, SET, Construtores", 
+	ao colocar @NonNull, ele cria um construtor com o parametro da instancia;
+	é o mesmo de usar um construtor com o parametro List<Cozinha> cozinhas e instancia-lo;
+	Também devo usar a propriedade @JacksonXmlRootElement(localName = "cozinhas") 
+		no Root da lista, assim não terá o nome da classe CozinhasXmlWrapper
+		
+		Um embrulho de um elemento em um XML;
+
+/*
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import lombok.Data;
+import lombok.NonNull;
+
+@JacksonXmlRootElement(localName = "cozinhas")
+@Data
+public class CozinhasXmlWrapper {
+
+	@NonNull
+	private List<Cozinha> cozinhas;
+}
+-----------------* Uso em CozinhaController:
+
+@GetMapping(produces = MediaType.APPLICATION_XML_VALUE)
+public 	CozinhasXmlWrapper listar2() {
+	System.out.println("Listar 2");
+	return new CozinhasXmlWrapper(cozinhaRepository.listar());
+}
+
+Problema: Todas as tags viraram cozinhas:
+
+<cozinhas>
+    <cozinhas>
+        <cozinhas>
+            <id>1</id>
+            <titulo>Tailandesa</titulo>
+        </cozinhas>
+        <cozinhas>
+            <id>2</id>
+            <titulo>Indiana</titulo>
+        </cozinhas>
+        <cozinhas>
+            <id>3</id>
+            <titulo>Alemanha</titulo>
+        </cozinhas>
+    </cozinhas>
+</cozinhas>
+
+No método da classe CozinhasXmlWrapper, posso adicionar as propriedades:
+* @JsonProperty("cozinha") e @JacksonXmlElementWrapper(useWrapping = false)
+	Assim, ele vai tirar a <tag> que estava sobrando, 
+	e vai definir corretamente nossa nomenclatura XML:
+/*
+@JacksonXmlRootElement(localName = "cozinhas")
+@Data
+public class CozinhasXmlWrapper {
+
+	@JsonProperty("cozinha")
+	@JacksonXmlElementWrapper(useWrapping = false)
+	@NonNull
+	private List<Cozinha> cozinhas;
+}
+*/
+Saída:
+	<cozinhas>
+		<cozinha>
+			<id>1</id>
+			<titulo>Tailandesa</titulo>
+		</cozinha>
+		<cozinha>
+			<id>2</id>
+			<titulo>Indiana</titulo>
+		</cozinha>
+		<cozinha>
+			<id>3</id>
+			<titulo>Alemanha</titulo>
+		</cozinha>
+	</cozinhas>
+
+
+*/
+
+4.17. Conhecendo os métodos HTTP (Verbos HTTP)
+
+	Qual tipo de recurso é identificado pelo URI;
+	
+	Idempotência:
+		Pode ser aplicado mais de uma vez, 
+			sem que o resultado da primeira aplicação se altere;
+		
+	Principais Métodos HTTP:
+		* GET, POST, PUT, PATCH, DELETE, HEAD e OPTIONS *
+
+	REQUISICAO: GET /cozinhas HTTP/1.1
+	RESPOSTA: HTTP/1.1 200 OK {...}
+	GET é um método que serve para a representação de um recurso (Colcction resourse ou singleton resource)
+		seguro (safe metod), pois não modifica os recursos, ele é idempotente;
+
+	REQUISICAO: POST /cozinhas HTTP/1.1 {...}
+	RESPOSTA: HTTP/1.1 201 CREATED {...}	
+		Não é seguro (not safe), pois modifica os recursos, não é idempotente;
+			Ao criar um novo registro vc quebra a mágica do idempotente;
+
+	REQUISICAO: PUT /cozinhas/11 HTTP/1.1 {...}
+	RESPOSTA: HTTP/1.1 200 OK {...}
+		Funciona como crie ou atualize, mas o foco é atualizar
+			, e deve atualizar todo o recurso;
+	Não é seguro (not safe), pois modifica os recursos;
+	é Idempotênte, pois ao atualizar o registro uma vez, e atualiza-lo novamente,
+	retornará as mesmas informações feitas na primeira vez;
+
+	REQUISICAO: PATCH /cozinhas/11 HTTP/1.1 {...}
+	RESPOSTA: HTTP/1.1 200 OK {...}
+		Atualizar um recurso parcialmente;
+		Não é um metodo seguro, e é idempotente;
+		
+	REQUISICAO: DELETE /cozinhas/11 HTTP/1.1
+	RESPOSTA: HTTP/1.1 204 No Content
+	Idempotênte, o estado da aplicação continua o mesmo;
+		Se executarmos 2 vezes a exclusão do mesmo recurso, somente a primeira vai excluir, a segunda não fará nada;
+	
+	REQUISICAO: HEAD /cozinhas/11 HTTP/1.1
+	RESPOSTA: HTTP/1.1 200 OK
+		SERVE APENAS PARA PEGAR O CABEÇALHO DA MENSAGEM, CORPO NÃO;
+		CONTENT-Type: APPLICATION/Json (SEM CORPO)
+		[SEM CORPO]
+		
+	REQUISICAO: OPTIONS /cozinhas/11 HTTP/1.1
+	RESPOSTA: HTTP/1.1 200 OK
+	ALLOW: GET, PUT, DELETE;
+		retorna uma lista de métodos suportados pelo recurso;
+		
+
+4.18. Conhecendo os códigos de status HTTP
+
+	* Protocolos da internet (iana)
+	https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
+	https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status
+	
+	Status do HTTP - Nível 200 -> Success
+		- The action was successfully received, understood, and accepted
+	Status do HTTP - Nível 300 -> Redirection
+		- Further action must be taken in order to complete the request
+	Status do HTTP - Nível 400 -> Client Error
+		- The request contains bad syntax or cannot be fulfilled
+			401: Não autorizado -> Autenticação...
+	Status do HTTP - Nível 500 -> Server Error 
+		- The server failed to fulfill an apparently valid request
+			503: Serviço indisponível
+
+
+4.19. Definindo o status da resposta HTTP com @ResponseStatus
+
+	O Spring já retorna os códigos HTTP de acordo com as necessidades básicas, 
+		mas podemos injetar na mão caso necessário, basta usarmos @ResponseStatus no método necessário;
+
+/*
+	localhost:8087/cozinhas
+	@ResponseStatus(HttpStatus.OK)
+	@ResponseStatus(HttpStatus.BAD_REQUEST) -> 400 Bad Request
+	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+	public List<Cozinha> listar1() {
+		System.out.println("Listar 1");
+		return cozinhaRepository.listar();
+	}
+
+*/
+		
+
+4.20. Manipulando a resposta HTTP com ResponseEntity
+	ResponseEntity é um builder, ou seja, vai colocando as configurações...
+localhost:8087/cozinhas/buscar1/2
+	Customizando e padronizando a resposta HTTP "ResponseEntity";
+
+/*
+public ResponseEntity<Cozinha> buscar(@PathVariable("cozinhaId") Long id) {
+	System.out.println("param: " + id);
+	Cozinha cozinha = cozinhaRepository.buscar(id);
+	// return ResponseEntity.status(HttpStatus.OK).body(cozinha);
+	// ou 
+	// return ResponseEntity.status(HttpStatus.OK).build();
+	return ResponseEntity.ok(cozinha);
+}
+
+// ou
+
+	public ResponseEntity<Cozinha> buscar(@PathVariable("cozinhaId") Long id) {
+		System.out.println("param: " + id);
+		Cozinha cozinha = cozinhaRepository.buscar(id);
+		
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(HttpHeaders.LOCATION, "http://localhost:8087/cozinhas/buscar2/2");
+		return ResponseEntity.status(HttpStatus.FOUND).headers(headers).build();
+		
+	}
+*/
+
+
+
+4.21. Corrigindo o Status HTTP para resource inexistente -> ResponseEntity.notFound().build();
+	"HttpStatus.NOT_FOUND"
+
+	Quando o objeto não traz registro, trazer um status de não encontrado...
+		localhost:8087/cozinhas/buscar2/10
+		
+		Posso usar tb o código 204, que é sem conteúdo;
+/*
+
+	@GetMapping("/buscar2/{cozinhaId}")
+	public ResponseEntity<Cozinha> outraFormaBuscar(@PathVariable Long cozinhaId) {
+		System.out.println("param: " + cozinhaId);
+		Cozinha cozinha = cozinhaRepository.buscar(cozinhaId);
+		
+		if( cozinha != null ) {
+			return ResponseEntity.ok(cozinha);
+//			return ResponseEntity.status(HttpStatus.OK).body(cozinha);
+		}
+
+		return ResponseEntity.notFound().build();
+//		return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+	}
+
+
+*/
+
+
+4.22. Status HTTP para collection resource vazia: qual usar?
+
+	Como é uma lista (Array) de dados, é melhor retornar o array vazio [];
+	Assim o usuário consegue ter um mesmo tratamendo, devido ao tipo;
+	O código 200 é o objetivo, o cara acessou o recurso e retornou um objeto;
+	Poderiamos usar tb o 204, que avisa que nao houve conteúdo, mas existe um conteúdo do tipo array, só que vazio;
+	
+
+
+4.23. Modelando e implementando a inclusão de recursos com POST
+	O post "não é idempotente" pois toda vez que fizermos uma requisição no servidor ele tem um efeito colateral no servidor a partir da primeira.
+
+	POST /cozinhas HTTP/1.1
+	Content-Type: application/json
+	{
+		"nome": "Brasileira",
+		"descricao": "Melhor Cozinha do Brasil"
+	}
+
+localhost:8087/cozinhas
+{"titulo":"Mexicana","twitter":"#comidamexicana"}
+{"nome":"Mexicana","twitter":"#comidamexicana"}
+
+
+/*
+
+Codigo: 
+
+@PostMapping
+@ResponseStatus(HttpStatus.CREATED)
+public Cozinha adicionar (@RequestBody Cozinha cozinha) {
+	return cozinhaRepository.salvar(cozinha);
+}
+
+Uso: 
+curl -X POST -H "Content-type: application/json" -d "{\"titulo\":\"Mexicana\",\"twitter\":\"#comidamexicana\"}" http://localhost:8087/cozinhas
+
+Resultado:
+{
+    "id": 4,
+    "twitter": "#comidamexicana",
+    "titulo": "Mexicana"
+}
+
+*/
+
+
+
+4.24. Negociando o media type do payload do POST com Content-Type
+	Usar xml retornar json
+	
+	Content-Type: application/xml
+	Accept: application/json ou application/xml
+		
+	<cozinha>
+		<id>2</id>
+		<twitter>#comidaindiana</twitter>
+		<titulo>Indiana</titulo>
+	</cozinha>
+
+curl -X POST -H "Content-type: application/json" -d "{\"titulo\":\"Mexicana\",\"twitter\":\"#comidamexicana\"}" http://localhost:8087/cozinhas
+
+	{
+		"id": 4,
+		"twitter": "#comidamexicana",
+		"titulo": "Mexicana"
+	}
+
+4.25. Modelando e implementando a atualização de recursos com PUT
+	O PUT é Idempotênte, pois várias requisicões sequenciais 
+		não mudaram o estado da primeira requisição;
+
+PUT /cozinhas/{id} HTTP/1.1
+Content-Type: application/json
+{
+	"nome": "Indiana - atualizada",
+}
+
+BeanUtils.copyProperties(cozinha, cozinhaAtual, "id");
+	Coloco o terceiro parametro para não usar na hora de copiar os atributos;
+
+/*
+import org.springframework.beans.BeanUtils;
+
+	@PutMapping("/{cozinhaId}")
+	public ResponseEntity<Cozinha> atualizar(@PathVariable Long cozinhaId
+			, @RequestBody Cozinha cozinha) {
+		Cozinha cozinhaAtual = cozinhaRepository.buscar(cozinhaId);
+		if( cozinhaAtual != null ) {
+			// cozinhaAtual.setNome(cozinha.getNome());
+			// cozinhaAtual.setTwitter(cozinha.getTwitter());
+			BeanUtils.copyProperties(cozinha, cozinhaAtual, "id");
+			cozinhaAtual = cozinhaRepository.salvar(cozinhaAtual);
+			return ResponseEntity.ok().body(cozinhaAtual);
+		}
+		return ResponseEntity.notFound().build();
+	}
+
+*/
+
+curl -X PUT -H "Content-type: application/json" -d "{\"titulo\":\"Indiana - titulo atualizado\", \"twitter\":\"#comidaindiana-2\"}" http://localhost:8087/cozinhas/2
+
+4.26. Modelando e implementando a exclusão de recursos com DELETE
+	O DELETE é Idempotênte, pois várias requisicões sequenciais 
+		não mudaram o estado da primeira requisição;
+			Uma vez deletado na primeira requisição, 
+			ele não gera um efeito colateral no sistema 
+			se fizermos as requisições novamente;
+
+DELETE /cozinhas/{id} HTTP/1.1
+Content-Type: application/json
+/*
+	@DeleteMapping("/{cozinhaId}")
+	public ResponseEntity<Cozinha> remover(@PathVariable Long cozinhaId) {
+
+		Cozinha cozinha = cozinhaRepository.buscar(cozinhaId);
+		if( cozinha != null ) {
+			cozinhaRepository.remover(cozinha);
+			// ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+			return ResponseEntity.noContent().build();
+		}
+		return ResponseEntity.notFound().build();
+	}
+*/
+
+curl -X DELETE -H "Content-type: application/json" http://localhost:8087/cozinhas/5
+
+
+
+4.27. Implementando a camada de domain services (e a importância da linguagem ubíqua)
+
+
+
+
+

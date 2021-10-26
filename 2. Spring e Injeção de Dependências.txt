@@ -1,0 +1,794 @@
+
+
+* Especialista Sprint REST !!!
+
+
+Capitulo 2. Spring e Injeção de Dependências
+
+	@PostConstruct (ações pré-construtor) -> @Bean(initMethod = "metodoInit", destroyMethod = "metodoDestroy") 
+	@PreDestroy (ações pré-destruction) -> @Bean(initMethod = "metodoInit", destroyMethod = "metodoDestroy") 
+	@Primary -> Avisar que este componente é o default em um determinado contexto;
+	@Component -> Praticamente tudo é um componente spring;
+	@Configuration e @Bean -> Gerar beans injetados na aplicação;
+	@Autowired -> serve para quando a aplicação não souber qual construtor iniciar, com o @Autowired ela saberá injetar o construtor corretamente;
+	@Retention(RetentionPolicy.RUNTIME) + @Qualifier('urgente')
+	@TipoNotificador(NivelUrgencia.SEM_URGENCIA_1) -> @TipoNotificador(value = NivelUrgencia.SEM_URGENCIA)
+	@EventListener -> Padrão Observer;
+	@Value("${notificador.email.host-servidor}") -> pegar chave-value do application properties
+
+2.1. Por que aprender e usar Spring?
+
+Spring -> Ecossitema;
+
+	Canivete suíço para desenvolvedores JAVA;
+	Simplicidade;
+	Maturidade - usado em produção;
+	Modularidade;
+	Evolução constante;
+	Open souce;
+	Comunidade grande e forte;
+	Popularidade;
+	Empregabilidade;
+	
+2.2. Conhecendo o ecossistema Spring
+	
+Site oficial Spring:
+	https://spring.io/
+
+* Spring Projetos:
+	Spring MVC -> usamos para produzir sistemas web;
+	Spring DATA -> Modelo de dados;
+	Sprint Boot -> Configura todo o projeto (convenções opnativa, configura da forma que quer);
+		Resolve o problema de configuração (convenções opnativa)
+		Forma de integração: opnativa;
+		Transação - toda transação DB tem que ser aberta e fechada por requisição "open session in view";
+		Spring Boot não é uma ferramenta de gerador de código, seu uso é pela facilidade de configuração dos projeto;
+
+2.3. Spring vs Jakarta EE (Java EE)
+* Spring VS (JakartaEE|JAVAEE|JEE);
+	JEE -> Especificações -> Padronizar a tecnologia;
+	Sprint -> Plataforma inovadora, seu objetivo não é padronizar é inovar;
+
+2.4. Conhecendo o Spring Boot
+	https://spring.io/projects/spring-boot
+	Configuração programatica no proprio codigo Java;
+	Convention Over Configuration;
+	Spring Boot configura quase tudo, através de uma visão opnativa;
+	* Ajuda o Maven;
+
+
+********************************************************
+
+Nota de atualização para a versão 2.4.3 
+	e alteração para a versão 2.1.7.RELEASE
+
+
+	https://start.spring.io/
+	
+* Nota de atualização para a versão 2.4.3 e alteração para a versão "2.1.7.RELEASE"
+	usar o projeto do curso para referencias -> Trocar a versão do spring "2.1.7.RELEASE" e a versão do java para 12;
+	https://github.com/algaworks/curso-especialista-spring-rest/blob/master/02.05-criando-um-projeto-spring-boot-com-spring-initializr/algafood-api/pom.xml	
+
+Quando é realizada a criação de um projeto Spring através de uma IDE (STS, Visual Studio Code, IntelliJ) 
+	ou pelo site mostrado no vídeo são oferecidas como opção as versões mais recentes do Spring (atualmente 2.4.3 como versão estável).
+
+Entretanto, a realização do downgrade para a versão 2.1.7.RELEASE, indicada como ideal para a realização do curso, 
+	pode causar problemas. Em geral, os problemas enfrentados são devido a uma atualização no pacote de dependências 
+	spring-boot-starter-test, responsável principalmente pelos testes automatizados do sistema.
+
+Para superar esse problema relativo à biblioteca de testes pode ser feita uma das seguintes ações
+Exclusão do arquivo de testes AlgafoodApiApplicationTests.java
+Essa solução é simples e não afeta o aprendizado. 
+	No módulo 10, quando são tratados os testes automatizados, 
+	a classe deverá ser novamente criada e receberá as anotações corretas.
+Exclusão das anotações do arquivo de testes AlgafoodApiApplicationTests.java
+
+Outra solução simples e prática. A exclusão das anotações e dos imports 
+	que as referenciam também corrige o problema. 
+	Essas anotações serão recolocadas no módulo 10.
+	
+* Correção das importações do arquivo de testes AlgafoodApiApplicationTests.java
+Nesse caso, basta deletar os imports da classe e recolocá-los da forma correta. 
+	Algumas IDEs possuem opções de importação automática que auxiliam na correta colocação dos pacotes necessários.
+Adição da biblioteca do JUnit 5
+
+Essa é a verdadeira raiz do problema. A partir do Spring 2.2.0 o 
+	JUnit 5 passou a ser o padrão dos testes. 
+	Sendo assim, a importação explícita da dependência, que não é 
+		necessária nas versões mais recentes, 
+		passa a ser obrigatória na versão 2.1.7.RELEASE. 
+		Para adicionar essa dependência é necessário colocar a seguinte 
+		configuração no pom.xml
+		
+
+<dependency>
+    <groupId>org.junit.jupiter</groupId>
+    <artifactId>junit-jupiter</artifactId>
+    <version>5.5.2</version>
+    <scope>test</scope>
+</dependency>
+
+
+
+********************************************************
+
+2.5. Criando um projeto Spring Boot com Spring Initializr
+	
+
+* Código fonte do git da algaworks para referencias:
+	https://github.com/algaworks/curso-especialista-spring-rest/tree/master/02.05-criando-um-projeto-spring-boot-com-spring-initializr/algafood-api
+	Criar um projeto pelo IDE (eclipse do spring);
+	Configura-lo, na próxima página lembrar de adicionar as dependencias por exemplo o projeto web;
+	O maven vai resolver as dependencias do projeto;
+
+	Criar projeto, configura-lo, escolher a versão, 
+		depois lembrar de baixar a versão para 2.1.7.RELEASE que foi a usada no curso;
+	Após concluido, ir no pom.xml e alterar a versão do spring para "2.1.7.RELEASE" e baixar novamente as dependencias do maven (Maven -> Update Project);
+	<version>2.1.7.RELEASE</version>
+	E o JAVA usado é o 12: 
+	<java.version>12</java.version>
+
+	Abrir essa classe e roda-la para testar -> AlgafoodApiApplication -> RUN;
+	ou no "Boot Dashboard" (proprio do STS (eclipse do spring)) e dar o started;
+	  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+:: Spring Boot :: (v2.1.7.RELEASE)
+
+	Testar no browser: http://localhost:8080/
+	
+	* Podemos tb configurar o projeto direto do site spring:
+		https://start.spring.io/
+	
+	
+2.6. Conhecendo o Maven e o pom.xml de um projeto Spring Boot
+
+	Quando criamos o nosso projeto, criamos um projeto MAVEN;
+	Maven: Gerenciamento de dependencias;
+
+	Na raiz do projetos existem os arquivos (mvnw.cmd->windows|mvnw->mac): 
+		Permite rodar o maven pelo terminal, mesmo sem o maven instalado;
+
+	No eclipse: Rodar o RUN -> Maven Build -> Goals: package; e rodar;
+	Na linha de comando no repositório do projeto (objetivos do maven...): 
+	$ ./mvnw.cmd clean package
+		
+	posso rodar o projeto na linha de comando, e posso envia-lo para qualquer lugar:
+	$ java -jar target/algafood-api-0.0.1-SNAPSHOT.jar
+	
+	Configurações do pom.xml:
+		<parent>: estamos herdando as configurações de algum lugar;
+		Ctrl+Click na tag <artifactId>spring-boot-starter-parent</artifactId> 
+			vai direcionar para o arquivo responsável pela versão a ser baixada;
+		
+		<properties>: especificar a versão do java 12, sobrescreve a versão pai da tag <artifactId>
+		
+		<dependencies>: Pegar no site do maven... groupId + artifactId + scope ...
+		Ex: spring-boot-starter-web;
+		
+		<build><plugins>...: Responsável para o build do projeto no spring-boot;
+		Ex: spring-boot-maven-plugin;
+		
+		Ver as abas de explicações do ciclo de vida do pom.xml 
+			(arquire|resolvidas|eftivo) do pom.xml pelo terminal
+		$ ./mvnw.cmd dependency:tree
+		$ ./mvnw.cmd dependency:resolve
+		$ ./mvnw.cmd help:effective-pom
+	
+	Quando baixamos as dependencias do maven, ele as coloca em um repositório localhost
+	$ cd: C:\Users\carlos.dossantos\.m2\repository
+	para ver os arquivos, basta ir na pasta do repository e digitar 
+	$ pwd
+	C:\Users\carlos.dossantos\.m2\repository\org\springframework...
+
+
+
+2.7. Criando um controller com Spring MVC
+
+	Na Classe aviso que é um @Controller
+		@Controller -> Responsável por receber requisições WEB;
+
+	No método que estou querendo trabalhar coloco o caminho e a resposta
+		@GetMapping("/hello")
+		@ResponseBody
+
+2.8. Restart mais rápido da aplicação com DevTools, 
+		alterar o código e ao salvar ele já restarta a aplicação, 
+		inclusive resources, o spring não restarta tudo, ele tem 2 classloader;
+
+	DEV-TOOLS; Botão direito no projeto -> Sprint -> ADD DEV-TOOLS;
+	Será adicionada uma dependencia no pom.xml do projeto
+	<dependency>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-devtools</artifactId>
+	</dependency>
+	
+
+2.9. O que é injeção de dependências?
+	
+	Problema: Alto acoplamento;
+	Solução: Inversão de Controle (IOC);
+	Usar uma implementação para quem for usar;
+	
+2.10. Conhecendo o IoC Container do Spring (Injeção de Dependências)
+	Inversão de Controle;
+	"Bean" é o nome dado ao objeto gerenciado pelo container do Spring;
+
+2.11. Definindo beans com @Component
+	Para dizer que uma classe é um BEAN/Component 
+		Spring eu preciso dizer a ele através da anotação "@Component";
+
+	Assim que sobe a aplicação, ela já realiza a instanciação dos componentes;
+	
+	Ao colocar a anotação @Controller ela tb é instanciada pelo @Component, 
+		então ela é tanto um controller como um component;
+		
+	O problema é usa-la em todos os lugares, devido a semantiva (significado/finalidade);
+		Usar @Component para um recurso WEB e para um recurso interno da aplicação;
+		
+	Para o spring conhecer essas classes de Beans, ele scaneia tudo, 
+	ele usa a anotação da classe inicial quando criamos o projeto 
+	@SpringBootApplication (AlgafoodApiApplication);
+	Essa anotação, usa a anotação: @ComponentScan;
+	@ComponentScan é o local que diz onde vamos scanear a aplicação toda procurando beans;
+	Nosso caso a partir da classe "AlgafoodApiApplication" 
+	do pacote "com.algaworks.algafood" e seus subpacotes, 
+	são elegíveis para ser um componente;
+	
+2.12. Injetando dependências (beans Spring)
+	
+	Uma das formas de preencher a Injeção de dependencias é pelo construtor 
+	da classe que está usando a dependencia, 
+	somente se a dependencia for um @Component do spring
+	/* 
+	@Component
+	.. NotificadorEmail {} ..
+
+	// AtivacaoClienteService *
+	private NotificadorEmail notificador;
+	public AtivacaoClienteService(NotificadorEmail notificador)
+	{
+		System.out.println("Construtor -AtivacaoClienteService- chamado.");
+		this.notificador = notificador;
+	}
+	*/
+
+	O Spring é inteligente, ele instancia de forma dos chamados da dependencia da primeira a ser usada até a última: 
+		Construtor -NotificadorEmail- chamado.
+		Construtor -AtivacaoClienteService- chamado.com.algaworks.algafood.di.notificacao.NotificadorEmail@2f0c0a2f
+		Construtor -MeuPrimeiroController- chamado.com.algaworks.algafood.di.service.AtivacaoClienteService@3789e77e
+
+		http://localhost:8080/hello (Hello João)
+		Notificando João através do e-mail joao@xyz.com: Seu cadastro no sistema está ativo!
+
+	Cuidado ao criar interfaces para tudo, para não deixar o projeto muito burocrático, segregação;
+	
+	
+2.13. Usando @Configuration e @Bean para definir beans 
+	* As vezes uma dependencia precisa de alguma configuração no servidor, 
+		ou antes que seja injetada, "@Configuration e @Bean", resolverão esse problema.
+
+	* Manipula os objetos e deixa a classe original livre - java puro
+
+	Criar um arquivo para configuração @Configuration, que tb é um @Component Spring;
+		Esse anotação @Configuration serve para definição de @Bean, 
+			ou seja configurar uma classe usada para injeções de dependencias 
+			que necessite de parametrizações;
+		O metodo @Configuration (AlgaConfig) é responsável por 
+			instanciar e configurar o objeto BEAN (NotificadorEmail) e 
+			já disponibiliza-lo da forma correta na injeção de 
+			dependencias (@Bean);
+		@Bean essa anotação inicializa e configura um objeto que 
+			será gerenciado pelo Container spring pelo @Configuration
+	
+		Mas no caso eu só digo a classe configurativa, a classe antes de ser configurada não deve ter mais a anotação;
+		AlgaConfig -> NotificadorEmail
+		Agora posso configurar uma classe e a classe original não terá dependencia nenhuma do Frameworkd Spring é uma classe JAVA pura.
+	
+		Na classe de configuração AlgaConfig, ao usar o AtivacaoClienteService, eu preciso usar o bean já tratado então uso o método bean da classe NotificadorEmail usado em AlgaConfig
+		
+		Alga config agora é mais generalizada:
+		AlgaConfig -> NotificacaoConfig + ServiceConfig;
+		Agora para usar 2 serviços de config basta coloca-lo nos parametros do método;
+			O Spring é inteligente suficiente para saber que quem chama-lo é o cara esperado;
+			/*
+			@Configuration
+			public class NotificacaoConfig {
+				@Bean
+				public NotificadorEmail notificadorEmail() {
+					...
+			@Configuration
+			public class ServiceConfig {
+				@Bean
+				public AtivacaoClienteService ativacaoClienteService(Notificador notificador) {
+					...
+			*/
+		
+2.14. Conhecendo os pontos de injeção e a anotação @Autowired
+
+	* 2.14.1 Construtor é um ponto de injeção;
+	A anotação @Autowired serve para quando a aplicação não souber qual construtor iniciar, com o @Autowired ela saberá injetar o construtor corretamente;
+	Então quando temos apenas um construtor, "@Autowired" é opcional, mas quando temos mais de um, 
+		temos que avisar ao Beans qual vamos usar nas injeções de dependencias;
+		É o lugar ideal, pois deixa claro, quais são as dependencias obrigatórias daquela classe;
+
+		//	@Autowired
+		//	public AtivacaoClienteService(Notificador notificador)
+		//	{
+		//		System.out.println("Construtor -AtivacaoClienteService- chamado." + notificador);
+		//		this.notificador = notificador;
+		//	}
+		//	public AtivacaoClienteService(String qualquer) {
+		//		
+		//	}
+	
+	* 2.14.2 Outro ponto de injeção é um setters
+		//	@Autowired
+		//	public void setNotificador(Notificador notificador) {
+		//		this.notificador = notificador;
+		//	}
+
+	* 2.14.3 Outro ponto de injeção é no próprio atributo, mesmo sendo privado.
+		Este existe um problema, pois dificulta os testes das classes, ou ainda uma configuração programatica da classe;
+		//	@Autowired
+		//	private Notificador notificador;
+
+2.15. Dependência opcional com @Autowired
+
+	Normalmente quando  usamos @Autowired, diz para o Spring que é uma dependencia obrigatória;
+	Transformar em opcional basta: @Autowired(required = false)
+		// @Autowired(required = false)
+		// private Notificador notificador;
+
+2.16. Ambiguidade de beans e injeção de lista de beans
+	Resolvendo ambiguidade entre @Autowired (Varios beans (NotificadorEmail|NotificadorSms))
+	uso: 	
+
+//	@Autowired
+//	private List<Notificador> notificadores;
+
+//	this.notificadores.stream().forEach(obj -> obj.notificar(cliente, "Seu cadastro no sistema está ativo!"));
+	
+2.17. Desambiguação de beans com @Primary
+	Definir um Bean padrão para começar um bean com maior prioridade, quando existir vários beans no mesmo contexto;
+
+	No caso escolhi o NotificadorEmail, basta colocar o @Primary em cima de @Componente
+//@Primary
+//@Component
+//public class NotificadorEmail implements Notificador {
+
+2.18. Desambiguação de beans com @Qualifier (@Qualifier("email"))
+	@Qualifier é uma anotação que usa um identificador para qualificar nosso componente
+	Posso usar com @Primary, e usar o qualificar, caso nenhum use, ele escolhe o @Primary;
+	Tentar usar nomes de @Qualifier com nomes abrangentes (normal, urgente, prioritario), 
+		então quando precisar troca-lo, basta trocar nas dependencias 
+		originais e não nas classes que usam.
+
+	1. Colocar na classe Bean
+// @Primary
+// @Qualifier("email")
+// @Component
+// public class NotificadorEmail implements Notificador {
+
+// @Qualifier("sms")
+// @Component
+// public class NotificadorSms implements Notificador {
+
+	2. Colocar na classe que vai usar o Bean?
+public class AtivacaoClienteService {
+// @Qualifier("email")
+// @Autowired
+// private Notificador notificador;
+
+
+2.19. Desambiguação de beans com anotação customizada (@Retention + @Qualifier)
+	* Mais elegante que o @Qualifier puro, pois o @Qualifier usa string, aqui usamos uma anotação própria e um enum
+	1. Criar uma anotação: TipoNotificador;
+		@Retention(RetentionPolicy.RUNTIME)
+			Anotação para ser lida em tempo de execução "obrigatória";
+
+// @Retention(RetentionPolicy.RUNTIME)
+// @Qualifier
+// public @interface TipoNotificador {
+// 		NivelUrgencia value();
+// }
+
+	2. Criar um Enum: NivelUrgencia;
+
+// public enum NivelUrgencia {
+// 	URGENTE,
+// 	SEM_URGENCIA,
+// 	NORMAL
+// }
+
+	3. declara a anotação criada nos beans:
+
+// @TipoNotificador(NivelUrgencia.URGENTE)
+// @Component
+// public class NotificadorEmail implements Notificador {
+
+// @TipoNotificador(NivelUrgencia.NORMAL)
+// @Component
+// public class NotificadorSms implements Notificador {
+
+// @TipoNotificador(value = NivelUrgencia.SEM_URGENCIA)
+// @Component
+// public class NotificadorWhatsapp implements Notificador {
+
+	4. usar na classe chamadora:
+
+// @TipoNotificador(NivelUrgencia.SEM_URGENCIA)
+// @Autowired
+// private Notificador notificador;
+
+
+
+2.20. Mudando o comportamento da aplicação com Spring Profiles
+
+	* Profiles: Perfil do servidor a ser escolhido;
+	Troca de ambiente do servidor por um parametro;
+	Local, AWS, Banco de dados, produção, desenvolvimento;
+	Se @Profile não estiver registrado no app, ele nem roda no container spring;
+
+
+1. Em src/main/resources/"application.properties"
+	Colocar a flag sobre profiles, sem ponto e virgula no final;
+	spring.profiles.active = prod
+	ou spring.profiles.active = dev
+	#notificador.email.porta-servidor = 25 -> #comenta_uma_linha
+
+2. 
+@Profile("prod")
+@Primary
+@TipoNotificador(NivelUrgencia.URGENTE)
+@Component
+public class NotificadorEmail implements Notificador {
+
+3. 
+@Profile("dev")
+@TipoNotificador(NivelUrgencia.URGENTE)
+@Component
+public class NotificadorEmailMock implements Notificador {
+
+4. Outra forma é pelo spring Boot Dashboarding: botão direito, Open Config -> Profile ...
+
+5. Posso ter vários profiles ao mesmo tempo na aplicação
+	Em src/main/resources/"application.properties"
+	(dev|prod),(mysql|oracle|postgres), (S3|filesystem|AWS)
+	spring.profiles.active = dev, mysql, filesystem
+
+2.21. Criando métodos de callback do ciclo de vida dos beans
+	Ciclo de vida: Inicialização, Hora de uso do Bean e a fase de destruição;
+
+	@PostConstruct -> nem é do spring é uma especificação jsr250, javax.annotation, mas o spring usa.
+	@PreDestroy -> antes de destruir o bean ele roda alguma coisa;
+
+/* 1. 
+@Component
+public class AtivacaoClienteService {
+
+//Metodos de callback init e destroy; 
+
+2. Depois de rodar o construct da classe a ser usada;
+@PostConstruct
+public void init() {
+	System.out.println("AtivacaoClienteService.INIT");
+}
+
+3. Quando o bean deixa de existir
+@PreDestroy
+public void destroy() {
+	System.out.println("AtivacaoClienteService.DESTROY");
+}
+*/
+
+4. Na classe de @Configuration e @Bean, essas informações de pre e post, 
+	podem ser configuradas no próprio @bean
+	* Chamando direto na ServiceConfig, para não ficar configurando tudo aqui;
+ServiceConfig.
+
+// 4.1
+@Configuration
+public class ServiceConfig {
+	@Bean(initMethod = "metodoInit", destroyMethod = "metodoDestroy")
+	public AtivacaoClienteService ativacaoClienteService(Notificador notificador) {
+}
+// 4.2
+public class AtivacaoClienteService {
+
+	public void metodoInit() {
+		System.out.println("AtivacaoClienteService.INIT:: " + notificador);
+	}
+
+	public void metodoDestroy() {
+		System.out.println("AtivacaoClienteService.DESTROY");
+	}
+}
+
+5. Ou ainda implementar uma interface 
+	InitializingBean (init) e DisposableBean (destroy)
+
+* public class AtivacaoClienteService implements InitializingBean, DisposableBean {
+
+que implementarão os métodos já nomeados:
+
+	@Override
+	public void destroy() throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+2.22. Publicando e consumindo eventos customizados (Observer)
+	Designer Pattern -> Observer;
+		Acoplamento mais baixos;
+		EventHandler;
+		Emitir um sinal: AtivacaoClienteService.ApplicationEventPublisher
+		Existir ouvintes: NotificacaoService (@EventListener - consumidores esperando o sinal);
+
+2.22.1. Em AtivacaoClienteService:
+public class AtivacaoClienteService {
+@Autowired
+private ApplicationEventPublisher applicationEventPublisher;
+public void ativar(Cliente cliente) {
+	cliente.ativar();
+	applicationEventPublisher.publishEvent(new ClienteAtivadoEvent(cliente));
+}
+
+2.22.2. Emitir o evento através de uma classe criada para transportar o evento: 
+	ClienteAtivadoEvent 
+
+2.22.3. classe que fica ouvindo se o evento foi emitido (@EventListener);
+@Component
+public class NotificacaoService {
+
+	@TipoNotificador(NivelUrgencia.SEM_URGENCIA_1)
+	@Autowired
+	private Notificador notificador;
+
+	@EventListener
+	public void clienteAtivadoListener(ClienteAtivadoEvent event) {
+		this.notificador.notificar(event.getCliente(), "Seu cadastro no sistema está ativo!");
+	}
+2.22.4, posso ter mais de uma classe ouvindo o evento, só botar o parametro emitido
+		@EventListener -> parametro esperando ClienteAtivadoEvent event;
+
+@Component
+public class EmissaoNotaFiscalService {
+
+	@EventListener
+	public void clienteAtivadoListener(ClienteAtivadoEvent event) {
+		System.out.println("Emitindo nota fiscao para o cliente: " + event.getCliente().getNome() + ".");
+	}
+
+
+2.23. Configurando projetos Spring Boot com o application.properties
+	link: 
+	https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html
+	Common Application Properties (application.properties)
+
+	Não fazer configurações hardcoded dentro do codigo, temos que externalizar os properties files:
+		yaml;
+		parametros em linha de comando;
+		no spring boot temos o application.properties (chave=valor);
+		
+/*
+spring.profiles.active = prod
+server.port = 8087
+server.servlet.application-display-name = Curso ESR - Algafoot
+
+spring.jpa.properties.hibernate.format_sql=true
+*/
+
+* http://localhost:8087/hello
+
+2.24. Substituindo propriedades via linha de comando/terminal e variáveis de ambiente
+
+	2.24.1 -> Linhas de comandos no terminal
+		Mesmas configurações do application.properties com 2 traços antes
+			$ java -jar target/algafood-api-0.0.1-SNAPSHOT.jar --server.port=8085
+
+		Caminho do .jar gerado na build do spring:
+			cd C:\Users\carlos.dossantos\Documents\Pessoais\Cursos\Algaworks\projetos\algafood-api\
+			$ java -jar target/algafood-api-0.0.1-SNAPSHOT.jar
+			$ java -jar target/algafood-api-0.0.1-SNAPSHOT.jar --server.port=8085
+
+2.24.2 -> Variáveis de ambiente:
+
+	* criar variável de ambiente (maiuscula):
+		$ export SERVER_PORT=8083
+		$ echo $SERVER_PORT
+		$ java -jar target/algafood-api-0.0.1-SNAPSHOT.jar
+
+	* definir e verificar variáveis de ambiente no windows:
+		set SERVER_PORT=8084
+		echo %SERVER_PORT%
+
+
+/** Caso tenha problemas na variáveis de ambiente devido a versão do java.
+	JAVA Version - variáveis de ambiente:
+	Variáveis de usuário
+	JDK
+	C:\Program Files\Java\jdk-11.0.11\bin
+		C:\Desenvolvimento\jdk-16.0.2\bin
+	Variáveis do sistema
+	JAVA_HOME
+	C:\Program Files\Java\jdk-11.0.11
+		C:\Desenvolvimento\jdk-16.0.2
+ */
+
+
+2.25. Criando e acessando propriedades customizadas com @Value
+	@Value("${...}")
+	Cria-se as chave-valores no application.properties e posso usar na aplicação;
+
+Definir as chaves no application.properties:
+notificador.email.host-servidor = smtp.algafood.com.br
+notificador.email.porta-servidor = 25
+
+Uso: 
+/*
+public class NotificadorEmail implements Notificador {
+
+	@Value("${notificador.email.host-servidor}")
+	private String host;
+
+	@Value("${notificador.email.porta-servidor}")
+	private Integer porta;
+
+	@Override
+	public void notificar(Cliente cliente, String mensagem)
+	{
+		//vindo do application.properties
+		System.out.println("HOST: " + this.host);
+		
+		//vindo do application.properties
+		System.out.println("PORTS: " + this.porta);
+		...
+
+Saída:
+HOST: smtp.algafood.com.br
+PORTS: 25
+*/
+
+
+2.26. Acessando propriedades com @ConfigurationProperties
+	Quando preciso criar muitas configurações personalizadas (application.properties), 
+		Cria-se uma classe de configurações personalizadas,
+			assim posso agrupa-las.
+	O bom é que posso injetar as propriedades como um objeto em vez de valor por valor;
+	Na verdade eu pego as configurações do application.properties e levo para a classe de configurações (@ConfigurationProperties);
+
+	uso o prefixo das configurações do application properties: 
+		@ConfigurationProperties("notificador.email")
+			Daqui para frente transformo o resto das chaves em atributos e seus getters e setters:
+			Posso tb deixar uma porta padrão na classe, 
+				assim se não existir objeto configurado no application.properties a classe vai rodar o padrão, 
+					E se existir padrão na classe, ela substitui o a do application.properties;
+
+Onde: 
+notificador.email.host-servidor = smtp.algafood.com.br
+notificador.email.porta-servidor = 25
+Uso:
+* notificador.email
+host-servidor -> hostServidor
+porta-servidor -> portaServidor
+
+/*
+@Component
+@ConfigurationProperties("notificador.email")
+public class NotificadorProperties {
+
+	/**
+	 * Host do servidor de e-mail, vindo do application.properties
+	 */
+	private String hostServidor;
+	
+	/**
+	 * Porta do servidor de e-mail, vindo do application.properties
+	 */
+	private Integer portaServidor = 28;
+
+	..
+*/
+
+/*
+
+Se mandar um aviso, então deve-se adicionar a dependencia ao pom.xml para autocomplete futuro;
+	Posso incluir a documentação do javadoc, assim ao realizar autocomplete ele explica o que faz
+No pom é adiconado a dependencia (somente no eclipse STS)
+
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-configuration-processor</artifactId>
+	<optional>true</optional>
+</dependency>
+
+*/
+
+Na hora de usar basta chama-lo com @Autowired:
+/*
+	public class NotificadorEmail implements Notificador {
+
+	@Autowired
+	private NotificadorProperties notificadorProperties;
+
+	@Override
+	public void notificar(Cliente cliente, String mensagem)
+	{
+		//vindo do NotificadorProperties -> application.properties
+		System.out.println("HOST: " + notificadorProperties.getHostServidor());
+		
+		//vindo do NotificadorProperties -> application.properties
+		System.out.println("PORTS: " + notificadorProperties.getPortaServidor());
+*/
+
+
+2.27. Alterando a configuração do projeto dependendo do ambiente (com Spring Profiles)
+
+	Chavear entre Desenvolvimento e Produção com os arquivos de configurações;
+
+	duplicar os application.properties, geralmente com as mesmas configurações por ambientes;
+	application.properties (default)
+	application-development.properties (development)
+	application-production.properties (production)
+	application-test.properties (test)
+
+	#ativar o profile desejado: application-development.properties (development), 
+		application-development.properties (production)
+			O que vale é o nome depois do traço "application-test.properties"
+spring.profiles.active = development
+
+* aparece na hora que roda o servidor:
+	The following profiles are active: development
+
+	* Obs: Não usar senhas sensíveis nessas configurações, pois todo mundo tem no código do projeto;
+
+Mesmo com essas configurações ativas nos application.properties, 
+	se rodar o spring com o eclipse em Open Config com o Profile 'production', 
+	o Open Config será mais forte;
+	spring.profiles.active = development
+	Mas ao rodar o Open Config especificando em Profile "production", a aplicação será production;
+
+
+2.28. Ativando o Spring Profile por linha de comando e variável de ambiente
+
+2.28.1 -> Rodar Profile pelo terminal:
+		Primeiro rodar o maven para gerar um novo jar da aplicação atualizada.
+			Depois testar com as configurações default do projeto (spring.profiles.active = development);
+		$ java -jar target/algafood-api-0.0.1-SNAPSHOT.jar
+			* The following profiles are active: development
+
+	Para trocar de profile, basta copiar a tag deseja do application.properties e definir a nova variável, nosso caso ativar o ambiente é spring.profiles.active:
+		$ java -jar target/algafood-api-0.0.1-SNAPSHOT.jar --spring.profiles.active=production
+	
+2.28.2 -> Rodar Profile por variáveis de ambiente:
+
+	lembrar de agora pegar a configuração desejada no application.properties 
+		e transformar em maiusculo e underscore...
+
+	Onde é spring.profiles.active = development
+		Será: SPRING_PROFILES_ACTIVE=production
+
+	uso no terminal mas para setar a variável de ambiente:
+		$ export SPRING_PROFILES_ACTIVE=production
+	Testo a nova variável:
+		$ echo $SPRING_PROFILES_ACTIVE
+	
+	então não precisarei mais passar o parametro na frente do jar, uso direto;
+		$ java -jar target/algafood-api-0.0.1-SNAPSHOT.jar
+	
+	
+	
+
+
+
