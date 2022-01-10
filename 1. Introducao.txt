@@ -1,0 +1,40 @@
+
+* Especialista Sprint REST !!!
+
+*** Treinamento Foda Back-end JAVA ***
+
+Como usar o suporte:
+	* Licença suporte ativa valida até 08/2022
+
+Domínio a ser usado: 
+	Criação de ifood;
+		https://assets.algaworks.com/portal/content/especialista-spring-rest/images/diagrama-de-classes-de-dominio.jpg
+
+Versão do java para baixar do curso: 
+	https://openjdk.java.net/ (Gratuito mesmo em produção)
+	Versão do curso: https://jdk.java.net/java-se-ri/12
+	Versão que baixei: https://jdk.java.net/16/
+java -version
+
+	
+Versão do IDE como ferramenta de desenvolvimento:
+	https://spring.io/tools
+
+Site oficial Spring:
+	https://spring.io/
+
+
+Rest precisa só conhecer o protocolo HTTP.
+
+
+Spring - Ecossistema Spring - Simplicidade e complexidade
+	Canivete suiço;
+	Simplicidade;
+	Maturidade;
+	Modularidade (uso o que preciso);
+	Evolução constante;
+	Open source;
+	Comunidade grande e forte;
+	Popularidade;
+	Empregabilidade;
+	

@@ -1,0 +1,26 @@
+
+rsa_cadu
+
+em: C:\Users\carlos.dossantos\.ssh
+* rsa_cadu
+* rsa_cadu.pub
+
+-----------------
+
+Gerar nova chave:
+
+ssh -T carlosofpersia@github.com
+
+ssh-keygen -t ed25519 -C "carloseduardophp@gmail.com"
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/rsa_cadu
+
+
+* depois copiar o texto dentro de rsa_cadu.pub e colar no github:
+SSH and GPG keys -> SSH keys
+
+
+https://github.com/settings/keys
+
+ou 
+ssh-keygen -t rsa -b 4096 -C "carloseduardophp@gmail.com"
